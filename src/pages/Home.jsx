@@ -1,6 +1,7 @@
 import React, { useContext} from 'react';
 import '../styles/Home.css';
 import { AuthContext } from '../context/authContext';
+import { SocketContext } from '../context/SocketContext';
 
 
 const Home = () => {
@@ -12,18 +13,23 @@ const Home = () => {
     logout();
   }
 
+  const {socket} = useContext(SocketContext);
+
+  const handleCreateRoom = async() =>{
+    const userId = await localStorage.getItem("userId").toString();
+    socket.emit("create-room", {userId});
+  }
+
 
 
   return (
     <div className='homePage'>
         welcome home
         <button onClick={handleLogOut}>logout</button>
-        {/* <h1>User Details</h1>
-        <p>Name: {user.name}</p>
-        <p>Email: {user.email}</p> */}
+        
 
         <div className="createMeetContainer">
-          <button>Create new meet</button>
+          <button onClick={handleCreateRoom}>Create new meet</button>
         </div>
 
     </div>

@@ -1,18 +1,31 @@
-import React, { createContext, useMemo, useState } from 'react';
-import { io } from 'socket.io-client';
+import React, { createContext, useEffect} from 'react';
+import { useNavigate } from 'react-router-dom';
+import socketIoClient, { io } from 'socket.io-client';
 
+
+
+export const SocketContext = createContext();
 
 const WS = 'http://localhost:6001';
 
-export const SocketContext = createContext();
-// socketIoClient(WS);
+const socket = socketIoClient(WS);
+
+
 
 export const SocketContextProvider = ({children}) => {
-    const socket = useMemo(() => io('localhost:6001'), []);
+  
+  const navigate = useNavigate();
     
-    
+  const enterRoom = ({roomId}) =>{
+    navigate(`/meet/${roomId}`);
+  }
+  
+  useEffect(()=>{
+    socket.on("room-created", enterRoom);
+  }, []);
+
   return (
-    <SocketContext.Provider  value={socket} >{children}</SocketContext.Provider>
+    <SocketContext.Provider  value={{socket}} >{children}</SocketContext.Provider>
   )
 }
 
