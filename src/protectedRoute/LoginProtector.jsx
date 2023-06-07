@@ -4,7 +4,7 @@ import { Navigate } from 'react-router-dom';
 const LoginProtector = ({children}) => {
     const token = localStorage.getItem('userToken');
 
-    if (token !== 'null'){
+    if (token !== 'null' && token){
       return <Navigate to='/' replace /> 
     }
   

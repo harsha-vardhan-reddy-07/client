@@ -1,9 +1,10 @@
-import React, { createContext, useEffect} from 'react';
+import React, { createContext, useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
-import socketIoClient, { io } from 'socket.io-client';
+import socketIoClient from 'socket.io-client';
+import { useClient, useMicrophoneAndCameraTracks } from '../AgoraSetup'
 
 
-
+ 
 export const SocketContext = createContext();
 
 const WS = 'http://localhost:6001';
@@ -12,20 +13,35 @@ const socket = socketIoClient(WS);
 
 
 
-export const SocketContextProvider = ({children}) => {
+export const SocketContextProvider =  ({children}) => {
   
   const navigate = useNavigate();
-    
-  const enterRoom = ({roomId}) =>{
-    navigate(`/meet/${roomId}`);
-  }
-  
-  useEffect(()=>{
-    socket.on("room-created", enterRoom);
-  }, []);
+  const userId = localStorage.getItem("userId");
 
+  const [inCall, setInCall] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [start, setStart] = useState(false);
+  const client = useClient();
+  const { ready, tracks } = useMicrophoneAndCameraTracks();
+
+
+  const [screenTrack, setScreenTrack] = useState(null);
+
+
+ 
+
+  useEffect(()=>{
+
+    const roomCreated = ({roomId}) =>{
+          navigate(`/meet/${roomId}`);
+    }
+    socket.on('room-created', roomCreated);
+  }, [socket]);
+
+
+  
   return (
-    <SocketContext.Provider  value={{socket}} >{children}</SocketContext.Provider>
+    <SocketContext.Provider  value={{userId, socket, inCall, setInCall, ready, tracks, screenTrack, setScreenTrack, client, users, setUsers, start, setStart}} >{children}</SocketContext.Provider>
   )
 }
 
